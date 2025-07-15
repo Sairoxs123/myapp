@@ -81,7 +81,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      DateFormat('yyyy-MM-dd').format(_selectedDate),
+                      DateFormat('yyyy-MM-dd').format(_selectedDate), // Corrected DateFormat usage
                     ),
                     const Icon(Icons.calendar_today),
                   ],
@@ -184,8 +184,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           ),
         ],
         currentIndex: 2, // Assuming 'Add' is the middle item
-        selectedItemBrightness: Brightness.dark,
-        unselectedItemBrightness: Brightness.dark,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
         backgroundColor: const Color(0xFF1A1A1A),
