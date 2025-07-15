@@ -69,7 +69,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         ),
         title: const Text('Add Expenses'),
         centerTitle: true,
-        backgroundColor: const Color(0xFF1A1A1A),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
