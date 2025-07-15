@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({Key? key}) : super(key: key);
+  const AddTransactionScreen({super.key});
 
   @override
   _AddTransactionScreenState createState() => _AddTransactionScreenState();
@@ -41,7 +41,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   void _saveTransaction() {
     // Implement saving transaction logic here
-    print('Date: ${_selectedDate}');
+    print('Date: $_selectedDate');
     print('Category: $_selectedCategory');
     print('Amount: ${_amountController.text}');
     print('Title: ${_titleController.text}');

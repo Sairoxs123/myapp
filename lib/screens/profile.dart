@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class ProfilePage extends StatelessWidget {
   final User? user;
 
-  const ProfilePage({Key? key, this.user}) : super(key: key);
+  const ProfilePage({super.key, this.user});
 
   @override
   Widget build(BuildContext context) {

@@ -227,10 +227,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildMonthSectionHeader('April', Icons.calendar_today_outlined),
-          ..._transactions.map((tx) => _buildTransactionItem(tx)).toList(),
+          ..._transactions.map((tx) => _buildTransactionItem(tx)),
           const SizedBox(height: 20),
           _buildMonthSectionHeader('March', null), // No icon for March as per design
-          ..._marchTransactions.map((tx) => _buildTransactionItem(tx)).toList(),
+          ..._marchTransactions.map((tx) => _buildTransactionItem(tx)),
         ],
       ),
     );
@@ -264,7 +264,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
   // A reusable widget for a single transaction item in the list
   Widget _buildTransactionItem(Transaction tx) {
     final bool isIncome = tx.amount > 0;
-    final String amountString = (isIncome ? '' : '-') + '\$${tx.amount.abs().toStringAsFixed(2)}';
+    final String amountString = '${isIncome ? '' : '-'}\$${tx.amount.abs().toStringAsFixed(2)}';
     final Color amountColor = isIncome ? Colors.green : Colors.blue.shade600;
 
     return Container(

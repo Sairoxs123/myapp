@@ -86,12 +86,15 @@ class _HomePageState extends State<HomePage> {
       currentWidgetOptions[2] = const Center(
         child: CircularProgressIndicator(),
       );
+            currentWidgetOptions[3] = const Center(
+        child: CircularProgressIndicator(),
+      );
     }
 
     return Scaffold(
       body: Center(child: currentWidgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color.fromARGB(255, 188, 190, 188),
+        unselectedItemColor: Colors.grey,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
