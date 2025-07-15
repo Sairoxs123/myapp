@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'add_transaction_screen.dart';
 
 class CategoryDetailScreen extends StatelessWidget {
   final String categoryName;
@@ -116,7 +117,7 @@ class CategoryDetailScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // Navigate to Add Transaction screen
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransactionScreen(categoryName: categoryName)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransactionScreen(categoryName: categoryName)));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green, // Adjust color to match design
@@ -132,32 +133,6 @@ class CategoryDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.green, // Adjust color to match design
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Categories',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Stats',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
           ),
         ],
       ),

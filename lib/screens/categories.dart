@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'category_detail_screen.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -116,15 +117,15 @@ class CategoriesScreen extends StatelessWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 children: [
-                  _buildCategoryTile(Icons.fastfood, 'Food'),
-                  _buildCategoryTile(Icons.directions_bus, 'Transport'),
-                  _buildCategoryTile(Icons.medical_services, 'Medicine'),
-                  _buildCategoryTile(Icons.local_grocery_store, 'Groceries'),
-                  _buildCategoryTile(Icons.house, 'Rent'),
-                  _buildCategoryTile(Icons.card_giftcard, 'Gifts'),
-                  _buildCategoryTile(Icons.savings, 'Savings'),
-                  _buildCategoryTile(Icons.movie, 'Entertainment'),
-                  _buildCategoryTile(Icons.add, 'More'),
+                  _buildCategoryTile(Icons.fastfood, 'Food', context),
+                  _buildCategoryTile(Icons.directions_bus, 'Transport', context),
+                  _buildCategoryTile(Icons.medical_services, 'Medicine', context),
+                  _buildCategoryTile(Icons.local_grocery_store, 'Groceries', context),
+                  _buildCategoryTile(Icons.house, 'Rent', context),
+                  _buildCategoryTile(Icons.card_giftcard, 'Gifts', context),
+                  _buildCategoryTile(Icons.savings, 'Savings', context),
+                  _buildCategoryTile(Icons.movie, 'Entertainment', context),
+                  _buildCategoryTile(Icons.add, 'More', context),
                 ],
               ),
             ),
@@ -134,10 +135,11 @@ class CategoriesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryTile(IconData icon, String label) {
+  Widget _buildCategoryTile(IconData icon, String label, BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // TODO: Navigate to category detail screen
+        Navigator.push(context,
+        MaterialPageRoute(builder: (context) => CategoryDetailScreen(categoryName: label)));
       },
       child: Container(
         decoration: BoxDecoration(
