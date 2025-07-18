@@ -19,6 +19,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
+  User? _currentUser;
 
   @override
   void initState() {
@@ -51,9 +52,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   void _saveTransaction() async {
-    final user = Provider.of<AuthService>(context, listen: false).currentUser;
-    if (user != null) {
-      final uid = user.uid;
+    if (_currentUser?.uid != null) {
+      final uid = _currentUser?.uid ?? "temp";
       final transaction = {
         'date': _selectedDate,
         'category': _selectedCategory,
@@ -61,13 +61,29 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         'title': _titleController.text,
         'message': _messageController.text,
       };
-      await FirebaseFirestore.instance.collection(uid).add(transaction);
-      Navigator.pop(context);
+      await FirebaseFirestore.instance.collection("users").doc(uid).collection("transactions").doc(_selectedDate.toString()).set(transaction);
+      showDialog(context: context, builder:
+      (BuildContext dialogContext) {
+        return AlertDialog(
+        title: const Text('Success'),
+        content: const Text('Transaction added successfully!'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("OK"),
+            onPressed: () {
+              Navigator.of(dialogContext).pop(); // Dismiss dialog
+              Navigator.of(context).pop(); // Dismiss AddTransactionScreen
+            },
+          )
+        ],
+      );
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    _currentUser = context.watch<AuthService>().currentUser;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

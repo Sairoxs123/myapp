@@ -5,15 +5,25 @@ import 'screens/landing.dart';
 import 'package:myapp/screens/onboarding_screen.dart';
 import 'package:provider/provider.dart';
 
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Finance App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const OnboardingScreen(),
+      home: Consumer<AuthService>(
+        builder: (context, authService, _) {
+          print(authService.currentUser?.email);
+          if (authService.currentUser == null) {
+            return const OnboardingScreen();
+          } else {
+            return const HomePage();
+          }
+        },
+      ), // Start with ChatHomePage
     );
   }
 }
