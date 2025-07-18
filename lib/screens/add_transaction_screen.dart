@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final String categoryName;
@@ -46,15 +50,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     super.dispose();
   }
 
-  void _saveTransaction() {
-    // Implement saving transaction logic here
-    print('Date: $_selectedDate');
-    print('Category: $_selectedCategory');
-    print('Amount: ${_amountController.text}');
-    print('Title: ${_titleController.text}');
-    print('Message: ${_messageController.text}');
-    // Navigate back after saving
-    Navigator.pop(context);
+  void _saveTransaction() async {
+    final user = Provider.of<AuthService>(context, listen: false).currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      final transaction = {
+        'date': _selectedDate,
+        'category': _selectedCategory,
+        'amount': _amountController.text,
+        'title': _titleController.text,
+        'message': _messageController.text,
+      };
+      await FirebaseFirestore.instance.collection(uid).add(transaction);
+      Navigator.pop(context);
+    }
   }
 
   @override
