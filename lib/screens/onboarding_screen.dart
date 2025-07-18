@@ -1,4 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/widgets/onboarding_page.dart';
+
+import 'package:myapp/screens/landing.dart';
+import 'package:myapp/screens/home.dart';
+import 'package:myapp/services/auth_service.dart';
+
+import 'package:myapp/screens/landing.dart';
+import 'package:myapp/screens/home.dart';
+import 'package:myapp/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -18,16 +28,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           PageView(
             controller: _pageController,
-            onPageChanged: (int page) {
+            onPageChanged: (index) {
               setState(() {
-                _currentPage = page;
+                _currentPage = index;
               });
             },
             children: const [
-              // TODO: Implement OnboardingPage as a separate widget and use it here
-              Placeholder(), // Placeholder for the first onboarding page
+              OnboardingPage(
+                imagePath: 'assets/onboarding_image_1.png', // Replace with your image path
+                title: 'Welcome to My App',
+                description: 'Easily manage your expenses and track your spending.',
+              ),
+              OnboardingPage(
+                imagePath: 'assets/onboarding_image_2.png', // Replace with your image path
+                title: 'Stay Organized',
+                description: 'Categorize your transactions and gain insights into your habits.',
+              ),
+              // Add more OnboardingPage widgets for additional screens
             ],
           ),
+
           Positioned(
             bottom: 20.0,
             left: 0,
@@ -51,8 +71,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         curve: Curves.easeIn,
                       );
                     } else {
-                      // Navigate to the next screen (e.g., Login/Signup)
-                      // Navigator.pushReplacementNamed(context, '/login');
+                      final authService = Provider.of<AuthService>(
+                        context,
+                        listen: false,
+                      );
+                      if (authService.currentUser != null) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomePage(),
+                          ),
+                        );
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LandingPage(),
+                          ),
+                        );
+                      }
                     }
                   },
                   child: const Text('Next'),
