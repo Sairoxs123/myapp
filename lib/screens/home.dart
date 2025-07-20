@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart'; // Import Provider
 import '../services/auth_service.dart'; // Import AuthService
 import 'profile.dart';
-import 'transaction.dart';
+import 'transactions.dart';
 import 'categories.dart';
 
 class HomePage extends StatefulWidget {

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
 
 class Transaction {
   final IconData icon;
@@ -8,6 +12,7 @@ class Transaction {
   final String date;
   final String category;
   final double amount;
+  final String type;
 
   Transaction({
     required this.icon,
@@ -16,7 +21,15 @@ class Transaction {
     required this.date,
     required this.category,
     required this.amount,
+    required this.type
   });
+}
+
+class Month {
+  final String name;
+  final List<Transaction> transactions;
+
+  Month({required this.name, required this.transactions});
 }
 
 class TransactionScreen extends StatefulWidget {
@@ -27,95 +40,151 @@ class TransactionScreen extends StatefulWidget {
 }
 
 class _TransactionScreenState extends State<TransactionScreen> {
-  // Sample data for the transaction list
-  final List<Transaction> _transactions = [
-    Transaction(
-        icon: Icons.account_balance_wallet_outlined,
-        iconColor: Colors.blue.shade300,
-        title: 'Salary',
-        date: '18:27 - April 30',
-        category: 'Monthly',
-        amount: 4000.00),
-    Transaction(
-        icon: Icons.shopping_basket_outlined,
-        iconColor: Colors.orange.shade300,
-        title: 'Groceries',
-        date: '17:00 - April 24',
-        category: 'Pantry',
-        amount: -100.00),
-    Transaction(
-        icon: Icons.home_outlined,
-        iconColor: Colors.purple.shade300,
-        title: 'Rent',
-        date: '8:30 - April 15',
-        category: 'Rent',
-        amount: -674.40),
-    Transaction(
-        icon: Icons.directions_bus_outlined,
-        iconColor: Colors.green.shade300,
-        title: 'Transport',
-        date: '7:30 - April 08',
-        category: 'Fuel',
-        amount: -4.13),
+  List<Month> transactions = [];
+  List<String> months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
-  final List<Transaction> _marchTransactions = [
-    Transaction(
-        icon: Icons.fastfood_outlined,
-        iconColor: Colors.red.shade300,
-        title: 'Food',
-        date: '19:30 - March 31',
-        category: 'Dinner',
-        amount: -70.40),
-  ];
+  Future<void> _getData(String uid) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .collection("transactions")
+        .get();
+    if (snapshot.docs.isNotEmpty) {
+      int month = -1;
+      List<Transaction> transactions_per_month = [];
+      for (var doc in snapshot.docs) {
+        final Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+        if (data["timestamp"].toDate().month != month) {
+          month = data["timestamp"].toDate().month;
+          if (transactions_per_month.isNotEmpty) {
+            setState(() {
+              transactions.add(
+                Month(
+                  name: months[month - 1],
+                  transactions: transactions_per_month,
+                ),
+              );
+            });
+            transactions_per_month = [];
+          } else {
+            DateTime date = data["timestamp"].toDate();
+            transactions_per_month.add(
+              Transaction(
+                icon: Icons.fastfood_outlined,
+                iconColor: Colors.red.shade300,
+                title: data["title"],
+                date: "${date.hour}:${date.minute} - ${months[month - 1]}",
+                category: data["category"],
+                amount: data["amount"],
+                type: data["type"]
+              ),
+            );
+          }
+        }
+        setState(() {
+          transactions.add(
+            Month(
+              name: months[month - 1],
+              transactions: transactions_per_month,
+            ),
+          );
+        });
+      }
+    }
+  }
+
+  // Sample data for the transaction list
+  User? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the current user right after the widget is initialized
+    // Using WidgetsBinding.instance.addPostFrameCallback to ensure context is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _currentUser = Provider.of<AuthService>(context, listen: false).currentUser;
+      if (_currentUser != null) {
+        _getData(_currentUser!.uid);
+      } else {
+        // Handle case where user is not logged in, maybe navigate to login or show a message
+        print("User not logged in.");
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white, // Set a default white background
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF2ECC71),
         elevation: 0,
         title: Text(
           'Transaction',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.white),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_outlined, color: Colors.white),
+            icon: const Icon(
+              Icons.notifications_none_outlined,
+              color: Colors.white,
+            ),
             onPressed: () {},
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // This container holds the green header content.
-            Container(
-              color: const Color(0xFF2ECC71),
-              padding: const EdgeInsets.only(top: 20, bottom: 60), // Note the bottom padding
-              child: Column(
-                children: [
-                  _buildBalanceCard(),
-                  const SizedBox(height: 20),
-                  _buildIncomeExpenseRow(),
-                ],
-              ),
+      body: Column(
+        children: [
+          Container(
+            color: const Color(0xFF2ECC71),
+            padding: const EdgeInsets.only(
+              top: 20,
+              bottom: 60,
+            ), // Note the bottom padding
+            child: Column(
+              children: [
+                _buildBalanceCard(),
+                const SizedBox(height: 20),
+                _buildIncomeExpenseRow(),
+              ],
             ),
-            // This Transform widget pulls the white container up over the green one.
-            Transform.translate(
-              offset: const Offset(0.0, -40.0), // Adjust this offset to control the overlap
+          ),
+          Expanded(
+            child: Transform.translate(
+              offset: const Offset(0.0, -40.0),
               child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(40.0)),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(40.0),
+                  ),
                 ),
-                child: _buildTransactionList(),
+                child: ListView(
+                  padding: const EdgeInsets.all(20.0),
+                  children: [_buildTransactionList()],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -133,7 +202,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
-          )
+          ),
         ],
       ),
       child: const Column(
@@ -145,7 +214,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
           SizedBox(height: 8),
           Text(
             '\$7,783.00',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black87),
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
         ],
       ),
@@ -226,13 +299,19 @@ class _TransactionScreenState extends State<TransactionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMonthSectionHeader('April', Icons.calendar_today_outlined),
-          ..._transactions.map((tx) => _buildTransactionItem(tx)),
-          const SizedBox(height: 20),
-          _buildMonthSectionHeader('March', null), // No icon for March as per design
-          ..._marchTransactions.map((tx) => _buildTransactionItem(tx)),
+          ...transactions.map((month) => _buildMonthTransactions(month)),
         ],
       ),
+    );
+  }
+
+  Widget _buildMonthTransactions(Month month) {
+    return Column(
+      children: [
+        _buildMonthSectionHeader(month.name, Icons.calendar_today_outlined),
+        ...month.transactions.map((tx) => _buildTransactionItem(tx)),
+        const SizedBox(height: 20),
+      ],
     );
   }
 
@@ -245,7 +324,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black54),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black54,
+            ),
           ),
           if (icon != null)
             Container(
@@ -263,9 +346,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
 
   // A reusable widget for a single transaction item in the list
   Widget _buildTransactionItem(Transaction tx) {
-    final bool isIncome = tx.amount > 0;
-    final String amountString = '${isIncome ? '' : '-'}\$${tx.amount.abs().toStringAsFixed(2)}';
-    final Color amountColor = isIncome ? Colors.green : Colors.blue.shade600;
+    final bool isIncome = tx.type == "income";
+    final String amountString =
+        '${isIncome ? '' : '-'}\$${tx.amount.abs().toStringAsFixed(2)}';
+    final Color amountColor = isIncome ? Colors.green : Colors.red;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
@@ -288,7 +372,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
               children: [
                 Text(
                   tx.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 Text(
                   tx.date,
@@ -304,11 +391,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
           ),
           const SizedBox(width: 10),
           // Vertical Divider
-          Container(
-            height: 30,
-            width: 1,
-            color: Colors.grey.shade300,
-          ),
+          Container(height: 30, width: 1, color: Colors.grey.shade300),
           const SizedBox(width: 10),
           // Amount
           SizedBox(

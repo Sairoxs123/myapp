@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/widgets/onboarding_page.dart';
-
-import 'package:myapp/screens/landing.dart';
-import 'package:myapp/screens/home.dart';
-import 'package:myapp/services/auth_service.dart';
-
 import 'package:myapp/screens/landing.dart';
 import 'package:myapp/screens/home.dart';
 import 'package:myapp/services/auth_service.dart';

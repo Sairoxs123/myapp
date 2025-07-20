@@ -83,112 +83,120 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 250,
-              color: Color(0xFF00C49A),
-              child: SizedBox(
-                child: Center(
-                  child: Text(
-                    "Welcome",
-                    style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+      body: AutofillGroup(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 250,
+                color: Color(0xFF00C49A),
+                child: SizedBox(
+                  child: Center(
+                    child: Text(
+                      "Welcome",
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            Transform.translate(
-              offset: const Offset(
-                0.0,
-                -30.0,
-              ), // Adjust this value to control overlap
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(
-                  top: 50.0,
-                  left: 30.0,
-                  right: 30.0,
-                  bottom: 50.0,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30.0),
-                    topRight: Radius.circular(30.0),
+              Transform.translate(
+                offset: const Offset(
+                  0.0,
+                  -30.0,
+                ), // Adjust this value to control overlap
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(
+                    top: 50.0,
+                    left: 30.0,
+                    right: 30.0,
+                    bottom: 50.0,
                   ),
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 32.0,
-                    ), // Spacing between label and input
-                    TextField(
-                      controller: _emailController, // Assign controller
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText:
-                            'Enter email', // Placeholder text when field is empty
-                        hintText: 'e.g., john.doe@example.com', // Example text
-                        border:
-                            OutlineInputBorder(), // Adds a border around the input field
-                        prefixIcon: Icon(Icons.email), // Optional icon
-                      ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30.0),
+                      topRight: Radius.circular(30.0),
                     ),
-                    const SizedBox(height: 32.0),
-                    TextField(
-                      controller: _passwordController, // Assign controller
-                      obscureText: !_isPasswordVisible,
-                      decoration: InputDecoration(
-                        labelText:
-                            'Enter your password', // Placeholder text when field is empty
-                        border:
-                            OutlineInputBorder(), // Adds a border around the input field
-                        prefixIcon: Icon(Icons.lock), // Optional icon
-                        suffixIcon: IconButton(
-                          padding: EdgeInsets.zero, // Removes default padding
-                          constraints:
-                              const BoxConstraints(), // Allows the button to be smaller
-                          icon: Icon(
-                            _isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 32.0,
+                      ), // Spacing between label and input
+                      TextFormField(
+                        controller: _emailController, // Assign controller
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText:
+                              'Enter email', // Placeholder text when field is empty
+                          hintText:
+                              'e.g., john.doe@example.com', // Example text
+                          border:
+                              OutlineInputBorder(), // Adds a border around the input field
+                          prefixIcon: Icon(Icons.email), // Optional icon
+                        ),
+                        autofillHints: const [AutofillHints.email],
+                      ),
+                      const SizedBox(height: 32.0),
+                      TextFormField(
+                        controller: _passwordController, // Assign controller
+                        obscureText: !_isPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText:
+                              'Enter your password', // Placeholder text when field is empty
+                          border:
+                              OutlineInputBorder(), // Adds a border around the input field
+                          prefixIcon: Icon(Icons.lock), // Optional icon
+                          suffixIcon: IconButton(
+                            padding: EdgeInsets.zero, // Removes default padding
+                            constraints:
+                                const BoxConstraints(), // Allows the button to be smaller
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
                         ),
+                        autofillHints: const [AutofillHints.password],
                       ),
-                    ),
-                    const SizedBox(height: 30.0),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _handleSignInButtonPressed,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(
-                          0xFF00C49A,
-                        ), // Background color from your previous query
-                        foregroundColor: const Color(
-                          0xFF212121,
-                        ), // Text color (a dark grey/nearly black)
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            25.0,
-                          ), // Half of the height for full pill shape
+                      const SizedBox(height: 30.0),
+                      ElevatedButton(
+                        onPressed: _isLoading
+                            ? null
+                            : _handleSignInButtonPressed,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(
+                            0xFF00C49A,
+                          ), // Background color from your previous query
+                          foregroundColor: const Color(
+                            0xFF212121,
+                          ), // Text color (a dark grey/nearly black)
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              25.0,
+                            ), // Half of the height for full pill shape
+                          ),
+                          elevation: 0, // No shadow for a flat look
+                          // You can also use fixed size if you want a specific button size
+                          // minimumSize: Size(200, 50),
+                          // maximumSize: Size(double.infinity, 50),
+                          minimumSize: Size(200, 50),
                         ),
-                        elevation: 0, // No shadow for a flat look
-                        // You can also use fixed size if you want a specific button size
-                        // minimumSize: Size(200, 50),
-                        // maximumSize: Size(double.infinity, 50),
-                        minimumSize: Size(200, 50),
-                      ),
-                      child:
-                          _isLoading
-                              ? const Row(
+                        child: _isLoading
+                            ? const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
@@ -210,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ],
                               )
-                              : const Text(
+                            : const Text(
                                 "Log In",
                                 style: TextStyle(
                                   fontSize: 18,
@@ -218,17 +226,16 @@ class _LoginPageState extends State<LoginPage> {
                                   color: Colors.black,
                                 ),
                               ),
-                    ),
-                    const SizedBox(height: 32.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account?"),
-                        TextButton(
-                          onPressed:
-                              _isLoading
-                                  ? null
-                                  : () {
+                      ),
+                      const SizedBox(height: 32.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Don't have an account?"),
+                          TextButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () {
                                     // Disable if loading
                                     // Navigate to LoginPage
                                     //Navigator.pushReplacement(
@@ -238,26 +245,27 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder:
-                                            (context) => const SignUpPage(),
+                                        builder: (context) =>
+                                            const SignUpPage(),
                                       ),
                                     );
                                   },
-                          child: const Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              color: Color(0xFF00C49A),
-                              fontWeight: FontWeight.bold,
+                            child: const Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                color: Color(0xFF00C49A),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

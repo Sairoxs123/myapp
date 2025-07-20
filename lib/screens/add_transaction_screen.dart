@@ -26,7 +26,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     super.initState();
     _selectedCategory = widget.categoryName;
   }
-
+  List<String> months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   List<String> categories = ['Food', 'Transport', 'Medicine', 'Groceries', 'Rent', 'Gifts', 'Savings', 'Entertainment', 'More']; // Example categories
 
   Future<void> _selectDate(BuildContext context) async {
@@ -55,13 +55,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (_currentUser?.uid != null) {
       final uid = _currentUser?.uid ?? "temp";
       final transaction = {
-        'date': _selectedDate,
+        'timestamp': _selectedDate,
         'category': _selectedCategory,
-        'amount': _amountController.text,
+        'amount': double.parse(_amountController.text),
         'title': _titleController.text,
         'message': _messageController.text,
+        'type' : 'expense'
       };
-      await FirebaseFirestore.instance.collection("users").doc(uid).collection("transactions").doc(_selectedDate.toString()).set(transaction);
+      await FirebaseFirestore.instance.collection("users").doc(uid).collection("transactions").add(transaction);
       showDialog(context: context, builder:
       (BuildContext dialogContext) {
         return AlertDialog(
