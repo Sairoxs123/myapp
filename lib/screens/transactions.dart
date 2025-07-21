@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import 'package:myapp/main.dart';
+import 'package:myapp/models/transaction_model.dart';
+import 'package:myapp/screens/categories.dart';
 
 class Transaction {
   final IconData icon;
@@ -21,7 +24,7 @@ class Transaction {
     required this.date,
     required this.category,
     required this.amount,
-    required this.type
+    required this.type,
   });
 }
 
@@ -57,51 +60,70 @@ class _TransactionScreenState extends State<TransactionScreen> {
   ];
 
   Future<void> _getData(String uid) async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(uid)
-        .collection("transactions")
-        .get();
-    if (snapshot.docs.isNotEmpty) {
-      int month = -1;
-      List<Transaction> transactions_per_month = [];
-      for (var doc in snapshot.docs) {
-        final Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
-        if (data["timestamp"].toDate().month != month) {
-          month = data["timestamp"].toDate().month;
-          if (transactions_per_month.isNotEmpty) {
-            setState(() {
-              transactions.add(
-                Month(
-                  name: months[month - 1],
-                  transactions: transactions_per_month,
-                ),
-              );
-            });
-            transactions_per_month = [];
-          } else {
-            DateTime date = data["timestamp"].toDate();
-            transactions_per_month.add(
-              Transaction(
-                icon: Icons.fastfood_outlined,
-                iconColor: Colors.red.shade300,
-                title: data["title"],
-                date: "${date.hour}:${date.minute} - ${months[month - 1]}",
-                category: data["category"],
-                amount: data["amount"],
-                type: data["type"]
-              ),
-            );
-          }
-        }
-        setState(() {
-          transactions.add(
-            Month(
-              name: months[month - 1],
-              transactions: transactions_per_month,
+    List<TransactionModel> query = await isar.transactionModels
+        .where()
+        .sortByTimestampDesc()
+        .findAll();
+    Map<String, List<Transaction>> transactionsPerMonth = {};
+
+    if (query.isNotEmpty) {
+      for (final transaction in query) {
+        DateTime date = transaction.timestamp;
+        String month = months[date.month - 1];
+        if (transactionsPerMonth.containsKey(month)) {
+          transactionsPerMonth[month]!.add(
+            Transaction(
+              icon: Icons.fastfood_outlined,
+              iconColor: Colors.red.shade300,
+              title: transaction.title,
+              date: "${date.hour}:${date.minute} - ${months[date.month - 1]}",
+              category: transaction.category,
+              amount: transaction.amount,
+              type: transaction.type,
             ),
           );
-        });
+        } else {
+          transactionsPerMonth[month] = [
+            Transaction(
+              icon: Icons.fastfood_outlined,
+              iconColor: Colors.red.shade300,
+              title: transaction.title,
+              date: "${date.hour}:${date.minute} - ${months[date.month - 1]}",
+              category: transaction.category,
+              amount: transaction.amount,
+              type: transaction.type,
+            ),
+          ];
+        }
+      }
+      List<Month> temp = [];
+      transactionsPerMonth.forEach((key, value) {
+        temp.add(Month(name: key, transactions: value));
+      });
+      setState(() {
+        transactions = temp;
+      });
+    } else {
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              title: const Text('No Transactions'),
+              content: const Text("You haven't added any transactions yet."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop(); // Dismiss dialog
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => CategoriesScreen()));
+                  },
+                ),
+              ],
+            );
+          },
+        );
       }
     }
   }
@@ -115,7 +137,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
     // Get the current user right after the widget is initialized
     // Using WidgetsBinding.instance.addPostFrameCallback to ensure context is available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _currentUser = Provider.of<AuthService>(context, listen: false).currentUser;
+      _currentUser = Provider.of<AuthService>(
+        context,
+        listen: false,
+      ).currentUser;
       if (_currentUser != null) {
         _getData(_currentUser!.uid);
       } else {

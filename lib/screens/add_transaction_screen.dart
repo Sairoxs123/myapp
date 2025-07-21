@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import 'package:myapp/main.dart';
+import 'package:myapp/models/transaction_model.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final String categoryName;
@@ -20,7 +22,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
   User? _currentUser;
-
   @override
   void initState() {
     super.initState();
@@ -62,6 +63,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         'message': _messageController.text,
         'type' : 'expense'
       };
+
+      await isar.writeTxn(() async {
+        await isar.transactionModels.put(
+          TransactionModel(
+            timestamp: _selectedDate,
+            category: _selectedCategory!,
+            amount: double.parse(_amountController.text),
+            title: _titleController.text,
+            message: _messageController.text,
+            type: 'expense'
+          )
+        );
+      });
+
       await FirebaseFirestore.instance.collection("users").doc(uid).collection("transactions").add(transaction);
       showDialog(context: context, builder:
       (BuildContext dialogContext) {

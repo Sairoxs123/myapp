@@ -4,9 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'app.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:myapp/models/transaction_model.dart';
+
+late Isar isar;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final dir = await getApplicationDocumentsDirectory();
+
+  isar = await Isar.open(
+    [TransactionModelSchema],
+    directory: dir.path,
+    inspector: true,
+  );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     ChangeNotifierProvider(
