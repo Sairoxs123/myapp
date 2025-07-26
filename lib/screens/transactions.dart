@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'package:myapp/main.dart';
 import 'package:myapp/models/transaction_model.dart';
-import 'package:myapp/screens/categories.dart';
+import 'package:myapp/screens/home.dart';
 
 class Transaction {
   final IconData icon;
@@ -117,7 +117,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   child: const Text('OK'),
                   onPressed: () {
                     Navigator.of(dialogContext).pop(); // Dismiss dialog
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => CategoriesScreen()));
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
                   },
                 ),
               ],

@@ -20,6 +20,9 @@ void main() async {
     directory: dir.path,
     inspector: true,
   );
+  isar.writeTxn(() async {
+    await isar.transactionModels.clear();
+  });
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     ChangeNotifierProvider(
