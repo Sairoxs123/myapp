@@ -1,8 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 import 'category_detail_screen.dart';
+import 'package:myapp/main.dart';
+import 'package:myapp/models/categories_model.dart';
 
-class CategoriesScreen extends StatelessWidget {
+class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
+
+  @override
+  State<CategoriesScreen> createState() => _CategoriesScreenState();
+}
+
+class _CategoriesScreenState extends State<CategoriesScreen> {
+  List<String> categories = [];
+
+  Future<void> _getCategories() async {
+    List<CategoriesModel> query = await isar.categoriesModels.where().findAll();
+    List<String> temp = [];
+    if (query.isNotEmpty) {
+      query.forEach((category) => temp.add(category.categoryName));
+      setState(() {
+        categories = temp;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,28 +70,11 @@ class CategoriesScreen extends StatelessWidget {
                     bottom: 20,
                   ),
                   children: [
-                    _buildCategoryTile(Icons.fastfood, 'Food', context),
-                    _buildCategoryTile(
-                      Icons.directions_bus,
-                      'Transport',
-                      context,
-                    ),
-                    _buildCategoryTile(
-                      Icons.medical_services,
-                      'Medicine',
-                      context,
-                    ),
-                    _buildCategoryTile(
-                      Icons.local_grocery_store,
-                      'Groceries',
-                      context,
-                    ),
-                    _buildCategoryTile(Icons.house, 'Rent', context),
-                    _buildCategoryTile(Icons.card_giftcard, 'Gifts', context),
-                    _buildCategoryTile(Icons.savings, 'Savings', context),
-                    _buildCategoryTile(Icons.movie, 'Entertainment', context),
+                    ...categories.map((category) {
+                      return _buildCategoryTile(Icons.icecream_outlined, category, context);
+                    }),
                     _buildCategoryTile(Icons.add, 'More', context),
-                  ],
+                  ]
                 ),
               ),
             ),

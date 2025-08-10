@@ -1,21 +1,126 @@
 import 'package:flutter/material.dart';
 import 'add_transaction_screen.dart';
+import 'package:isar/isar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
+import 'package:myapp/main.dart';
+import 'package:myapp/models/transaction_model.dart';
 
-class CategoryDetailScreen extends StatelessWidget {
+class Transaction {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String date;
+  final String category;
+  final double amount;
+  final String type;
+
+  Transaction({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.date,
+    required this.category,
+    required this.amount,
+    required this.type,
+  });
+}
+
+class CategoryDetailScreen extends StatefulWidget {
   final String categoryName;
-
   const CategoryDetailScreen({super.key, required this.categoryName});
+
+  @override
+  State<CategoryDetailScreen> createState() => _CategoryDetailScreenState();
+}
+
+class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
+  List<String> months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  List<Transaction> transactions = [];
+
+  Future<void> _getData(String uid) async {
+    print(this.widget.categoryName);
+    final List<TransactionModel> query = await isar.transactionModels.filter().categoryEqualTo(this.widget.categoryName).findAll();
+    List<Transaction> temp = [];
+    if (query.isNotEmpty) {
+      for (final transaction in query) {
+        temp.add(
+          Transaction(
+            icon: Icons.fastfood_outlined,
+            iconColor: Colors.red.shade300,
+            title: transaction.title,
+            date: "${months[transaction.timestamp.month - 1]} ${transaction.timestamp.day}",
+            category: transaction.category,
+            amount: transaction.amount,
+            type: transaction.type,
+          ),
+        );
+      }
+      setState(() {
+        transactions = temp;
+      });
+    } else {
+            if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              title: const Text('No Transactions'),
+              content: const Text("You haven't added any transactions yet."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop(); // Dismiss dialog
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
+  User? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+      _currentUser = Provider.of<AuthService>(
+        context,
+        listen: false,
+      ).currentUser;
+      if (_currentUser != null) {
+        _getData(_currentUser!.uid);
+      } else {
+        // Handle case where user is not logged in, maybe navigate to login or show a message
+        print("User not logged in.");
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     // Dummy data for transactions
-    final List<Map<String, dynamic>> transactions = [
-      {'date': 'April 27', 'description': 'Dinner', 'amount': -26.00},
-      {'date': 'April 20', 'description': 'Delivery Pizza', 'amount': -18.35},
-      {'date': 'April 15', 'description': 'Lunch', 'amount': -15.40},
-      {'date': 'April 08', 'description': 'Brunch', 'amount': -12.13},
-      {'date': 'March 20', 'description': 'Dinner', 'amount': -27.20},
-    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -25,7 +130,7 @@ class CategoryDetailScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: Text(categoryName),
+        title: Text(this.widget.categoryName),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none),
@@ -34,7 +139,9 @@ class CategoryDetailScreen extends StatelessWidget {
             },
           ),
         ],
-        backgroundColor: const Color(0xFFC8E6C9), // Adjust color to match design
+        backgroundColor: const Color(
+          0xFFC8E6C9,
+        ), // Adjust color to match design
         elevation: 0,
       ),
       body: Column(
@@ -56,7 +163,10 @@ class CategoryDetailScreen extends StatelessWidget {
                         ),
                         Text(
                           '\$7,783.00',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -69,7 +179,11 @@ class CategoryDetailScreen extends StatelessWidget {
                         ),
                         Text(
                           '-\$1,187.40',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent,
+                          ),
                         ),
                       ],
                     ),
@@ -98,13 +212,17 @@ class CategoryDetailScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final transaction = transactions[index];
                 return ListTile(
-                  leading: const Icon(Icons.fastfood), // Replace with appropriate icon based on category/type
-                  title: Text(transaction['description']),
-                  subtitle: Text(transaction['date']),
+                  leading: const Icon(
+                    Icons.fastfood,
+                  ), // Replace with appropriate icon based on category/type
+                  title: Text(transaction.title),
+                  subtitle: Text(transaction.date),
                   trailing: Text(
-                    '${transaction['amount'] > 0 ? '+' : ''}\$${transaction['amount'].abs().toStringAsFixed(2)}',
+                    '${transaction.type != "expense" ? '+' : '-'}\$${transaction.amount.abs().toStringAsFixed(2)}',
                     style: TextStyle(
-                      color: transaction['amount'] > 0 ? Colors.green : Colors.redAccent,
+                      color: transaction.type != "expense"
+                          ? Colors.green
+                          : Colors.redAccent,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -117,7 +235,14 @@ class CategoryDetailScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // Navigate to Add Transaction screen
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransactionScreen(categoryName: categoryName)));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddTransactionScreen(
+                      categoryName: this.widget.categoryName,
+                    ),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green, // Adjust color to match design

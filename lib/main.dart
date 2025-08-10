@@ -7,6 +7,7 @@ import 'app.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:myapp/models/transaction_model.dart';
+import 'package:myapp/models/categories_model.dart';
 
 late Isar isar;
 
@@ -16,13 +17,13 @@ void main() async {
   final dir = await getApplicationDocumentsDirectory();
 
   isar = await Isar.open(
-    [TransactionModelSchema],
+    [TransactionModelSchema, CategoriesModelSchema],
     directory: dir.path,
     inspector: true,
   );
-  isar.writeTxn(() async {
-    await isar.transactionModels.clear();
-  });
+  //isar.writeTxn(() async {
+  //  await isar.transactionModels.clear();
+  //});
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     ChangeNotifierProvider(

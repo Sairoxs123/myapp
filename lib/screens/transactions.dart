@@ -139,7 +139,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _currentUser = Provider.of<AuthService>(
         context,
-        listen: false,
+        listen: true,
       ).currentUser;
       if (_currentUser != null) {
         _getData(_currentUser!.uid);
