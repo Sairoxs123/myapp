@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'package:myapp/main.dart';
 import 'package:myapp/models/transaction_model.dart';
+import 'package:myapp/models/categories_model.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final String categoryName;
@@ -25,10 +27,24 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
+    _getCategories();
     _selectedCategory = widget.categoryName;
   }
+
+   List<String> categories = [];
+
+  Future<void> _getCategories() async {
+    List<CategoriesModel> query = await isar.categoriesModels.where().findAll();
+    List<String> temp = [];
+    if (query.isNotEmpty) {
+      query.forEach((category) => temp.add(category.categoryName));
+      setState(() {
+        categories = temp;
+      });
+    }
+  }
+
   List<String> months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  List<String> categories = ['Food', 'Transport', 'Medicine', 'Groceries', 'Rent', 'Gifts', 'Savings', 'Entertainment', 'More']; // Example categories
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(

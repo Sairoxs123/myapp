@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:isar/isar.dart';
-import 'package:provider/provider.dart';
-import '../services/auth_service.dart';
 import 'package:myapp/main.dart';
 import 'package:myapp/models/transaction_model.dart';
 import 'package:myapp/screens/home.dart';
@@ -59,7 +56,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
     'December',
   ];
 
-  Future<void> _getData(String uid) async {
+  Future<void> _getData() async {
     List<TransactionModel> query = await isar.transactionModels
         .where()
         .sortByTimestampDesc()
@@ -129,25 +126,13 @@ class _TransactionScreenState extends State<TransactionScreen> {
   }
 
   // Sample data for the transaction list
-  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
     // Get the current user right after the widget is initialized
     // Using WidgetsBinding.instance.addPostFrameCallback to ensure context is available
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _currentUser = Provider.of<AuthService>(
-        context,
-        listen: true,
-      ).currentUser;
-      if (_currentUser != null) {
-        _getData(_currentUser!.uid);
-      } else {
-        // Handle case where user is not logged in, maybe navigate to login or show a message
-        print("User not logged in.");
-      }
-    });
+    _getData();
   }
 
   @override

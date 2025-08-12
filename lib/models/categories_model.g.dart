@@ -21,6 +21,11 @@ const CategoriesModelSchema = CollectionSchema(
       id: 0,
       name: r'categoryName',
       type: IsarType.string,
+    ),
+    r'iconCodePoint': PropertySchema(
+      id: 1,
+      name: r'iconCodePoint',
+      type: IsarType.long,
     )
   },
   estimateSize: _categoriesModelEstimateSize,
@@ -54,6 +59,7 @@ void _categoriesModelSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.categoryName);
+  writer.writeLong(offsets[1], object.iconCodePoint);
 }
 
 CategoriesModel _categoriesModelDeserialize(
@@ -64,6 +70,7 @@ CategoriesModel _categoriesModelDeserialize(
 ) {
   final object = CategoriesModel(
     categoryName: reader.readString(offsets[0]),
+    iconCodePoint: reader.readLong(offsets[1]),
   );
   object.id = id;
   return object;
@@ -78,6 +85,8 @@ P _categoriesModelDeserializeProp<P>(
   switch (propertyId) {
     case 0:
       return (reader.readString(offset)) as P;
+    case 1:
+      return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -315,6 +324,62 @@ extension CategoriesModelQueryFilter
   }
 
   QueryBuilder<CategoriesModel, CategoriesModel, QAfterFilterCondition>
+      iconCodePointEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'iconCodePoint',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QAfterFilterCondition>
+      iconCodePointGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'iconCodePoint',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QAfterFilterCondition>
+      iconCodePointLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'iconCodePoint',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QAfterFilterCondition>
+      iconCodePointBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'iconCodePoint',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QAfterFilterCondition>
       idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -392,6 +457,20 @@ extension CategoriesModelQuerySortBy
       return query.addSortBy(r'categoryName', Sort.desc);
     });
   }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QAfterSortBy>
+      sortByIconCodePoint() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'iconCodePoint', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QAfterSortBy>
+      sortByIconCodePointDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'iconCodePoint', Sort.desc);
+    });
+  }
 }
 
 extension CategoriesModelQuerySortThenBy
@@ -407,6 +486,20 @@ extension CategoriesModelQuerySortThenBy
       thenByCategoryNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'categoryName', Sort.desc);
+    });
+  }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QAfterSortBy>
+      thenByIconCodePoint() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'iconCodePoint', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QAfterSortBy>
+      thenByIconCodePointDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'iconCodePoint', Sort.desc);
     });
   }
 
@@ -431,6 +524,13 @@ extension CategoriesModelQueryWhereDistinct
       return query.addDistinctBy(r'categoryName', caseSensitive: caseSensitive);
     });
   }
+
+  QueryBuilder<CategoriesModel, CategoriesModel, QDistinct>
+      distinctByIconCodePoint() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'iconCodePoint');
+    });
+  }
 }
 
 extension CategoriesModelQueryProperty
@@ -445,6 +545,12 @@ extension CategoriesModelQueryProperty
       categoryNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'categoryName');
+    });
+  }
+
+  QueryBuilder<CategoriesModel, int, QQueryOperations> iconCodePointProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'iconCodePoint');
     });
   }
 }

@@ -3,6 +3,14 @@ import 'package:isar/isar.dart';
 import 'category_detail_screen.dart';
 import 'package:myapp/main.dart';
 import 'package:myapp/models/categories_model.dart';
+import 'package:myapp/screens/add_category_screen.dart';
+
+class Category {
+  final String name;
+  final int iconCodePoint;
+
+  Category({required this.name, required this.iconCodePoint});
+}
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -12,13 +20,13 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
-  List<String> categories = [];
+  List<Category> categories = [];
 
   Future<void> _getCategories() async {
     List<CategoriesModel> query = await isar.categoriesModels.where().findAll();
-    List<String> temp = [];
+    List<Category> temp = [];
     if (query.isNotEmpty) {
-      query.forEach((category) => temp.add(category.categoryName));
+      query.forEach((category) => temp.add(Category(name: category.categoryName, iconCodePoint: category.iconCodePoint)));
       setState(() {
         categories = temp;
       });
@@ -71,7 +79,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   ),
                   children: [
                     ...categories.map((category) {
-                      return _buildCategoryTile(Icons.icecream_outlined, category, context);
+                      return _buildCategoryTile(IconData(category.iconCodePoint, fontFamily: 'MaterialIcons'), category.name, context);
                     }),
                     _buildCategoryTile(Icons.add, 'More', context),
                   ]
@@ -164,7 +172,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CategoryDetailScreen(categoryName: label),
+            builder: (context) => label != "More" ? CategoryDetailScreen(categoryName: label) : const AddCategoryScreen(),
           ),
         );
       },

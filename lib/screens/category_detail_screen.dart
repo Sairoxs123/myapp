@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'package:myapp/main.dart';
 import 'package:myapp/models/transaction_model.dart';
+import 'package:myapp/screens/home.dart';
 
 class Transaction {
   final IconData icon;
@@ -54,7 +55,6 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   List<Transaction> transactions = [];
 
   Future<void> _getData(String uid) async {
-    print(this.widget.categoryName);
     final List<TransactionModel> query = await isar.transactionModels.filter().categoryEqualTo(this.widget.categoryName).findAll();
     List<Transaction> temp = [];
     if (query.isNotEmpty) {
