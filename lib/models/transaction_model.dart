@@ -2,9 +2,10 @@ import 'package:isar/isar.dart';
 
 part 'transaction_model.g.dart';
 
-@collection
+@Collection()
 class TransactionModel {
-  Id id = Isar.autoIncrement; // You can also use id = null to auto increment
+
+  Id id = Isar.autoIncrement;
 
   late DateTime timestamp;
   late double amount;
