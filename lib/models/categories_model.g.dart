@@ -15,7 +15,7 @@ extension GetCategoriesModelCollection on Isar {
 
 const CategoriesModelSchema = CollectionSchema(
   name: r'CategoriesModel',
-  id: -8282894918172491246,
+  id: -8282894918172490752,
   properties: {
     r'categoryName': PropertySchema(
       id: 0,
